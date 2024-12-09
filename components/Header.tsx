@@ -3,9 +3,17 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { PhoneIcon, EnvelopeIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+import { 
+  DropdownMenu, 
+  DropdownMenuTrigger, 
+  DropdownMenuContent, 
+  DropdownMenuItem 
+} from "@/components/ui/dropdown-menu"
 
 const menuVariants = {
   closed: {
@@ -44,6 +52,8 @@ const backdropVariants = {
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
+  const pathname = usePathname()
+  const isResourcePage = pathname.startsWith('/resources')
 
   useEffect(() => {
     const handleScroll = () => {
@@ -53,7 +63,6 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Prevent body scroll when menu is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
@@ -69,10 +78,17 @@ const Header = () => {
     setIsOpen(!isOpen)
   }
 
+  const resourcesItems = [
+    { name: 'Past Papers', href: '/resources/past-papers' },
+    { name: 'Student Portal', href: '/resources/student-portal' },
+    { name: 'Study Materials', href: '/resources/study-materials' },
+    { name: 'Video Tutorials', href: '/resources/video-tutorials' },
+  ]
+
   const navItems = ['Home', 'About', 'Services', 'Gallery', 'Contact']
 
   return (
-    <header className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-md' : 'bg-transparent'}`}>
+    <header className={`fixed w-full z-50 transition-all duration-300 ${isScrolled || isResourcePage ? 'bg-white shadow-md' : 'bg-transparent'}`}>
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-4">
           <Link href="/">
@@ -81,43 +97,79 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
-            {navItems.map((item, index) => (
-              <Link
-                key={item}
-                href={item === 'Home' ? '/' : 
-                      item === 'About' ? '/about' : 
-                      item === 'Services' ? '/services' : 
-                      item === 'Gallery' ? '/gallery' :
-                      item === 'Contact' ? '/contact' :
-                      `#${item.toLowerCase()}`}
-                className={`text-sm font-medium transition-colors ${isScrolled ? 'text-gray-800 hover:text-red-600' : 'text-white hover:text-red-200'}`}
-              >
-                {item}
-              </Link>
-            ))}
+            {navItems.map((item) => {
+              const itemPath = item === 'Home' ? '/' : item.toLowerCase()
+              const isActive = pathname === itemPath
+
+              return (
+                <Link
+                  key={item}
+                  href={itemPath}
+                  className={cn(
+                    "text-sm font-medium transition-colors hover:text-gray-900",
+                    isScrolled || isResourcePage ? "text-gray-600" : "text-white",
+                    isActive && (isScrolled || isResourcePage ? "text-red-600" : "text-red-400")
+                  )}
+                >
+                  {item}
+                </Link>
+              )
+            })}
+
+            {/* Resources Dropdown */}
+            <DropdownMenu 
+              trigger={
+                <span className={cn(
+                  "text-sm font-medium transition-colors hover:text-gray-900",
+                  isScrolled || isResourcePage ? "text-gray-600" : "text-white",
+                  pathname.startsWith('/resources') && (isScrolled || isResourcePage ? "text-red-600" : "text-red-400")
+                )}>
+                  Resources
+                </span>
+              }
+            >
+              <DropdownMenuContent align="end">
+                {resourcesItems.map((item) => (
+                  <DropdownMenuItem key={item.name} href={item.href}>
+                    {item.name}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </nav>
 
           {/* Desktop Contact Info and Donate Button */}
           <div className="hidden md:flex items-center space-x-4">
-            <a href="tel:+27437262171" className={`text-sm ${isScrolled ? 'text-gray-600 hover:text-red-600' : 'text-white hover:text-red-200'} transition-colors`}>
+            <a 
+              href="tel:+27437262171" 
+              className={cn(
+                "hover:text-gray-900",
+                isScrolled || isResourcePage ? "text-gray-600" : "text-white"
+              )}
+            >
               <PhoneIcon className="h-5 w-5 inline mr-2" />
               +27 43 726 2171
             </a>
-            <Button asChild className="bg-red-600 text-white hover:bg-red-700">
-              <Link href="#donate">Donate Now</Link>
+            <Button 
+              asChild 
+              className={cn(
+                "bg-red-600 text-white hover:bg-red-700",
+                isScrolled || isResourcePage ? "bg-red-600" : "bg-white/20 text-white hover:bg-white/30"
+              )}
+            >
+              <Link href="/donate">Donate Now</Link>
             </Button>
           </div>
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 rounded-md transition-colors duration-200 z-50 relative"
             onClick={toggleMenu}
-            aria-label="Toggle menu"
+            className="md:hidden p-2 focus:outline-none"
           >
             {isOpen ? (
-              <XMarkIcon className="h-6 w-6 text-gray-800" />
+              <XMarkIcon className={`h-6 w-6 ${isScrolled || isResourcePage ? 'text-gray-900' : 'text-white'}`} />
             ) : (
-              <Bars3Icon className={`h-6 w-6 ${isScrolled ? 'text-gray-600' : 'text-white'}`} />
+              <Bars3Icon className={`h-6 w-6 ${isScrolled || isResourcePage ? 'text-gray-900' : 'text-white'}`} />
             )}
           </button>
         </div>
@@ -128,62 +180,82 @@ const Header = () => {
             <>
               {/* Backdrop */}
               <motion.div
+                className="fixed inset-0 bg-black/50 z-40"
+                variants={backdropVariants}
                 initial="closed"
                 animate="open"
                 exit="closed"
-                variants={backdropVariants}
-                className="fixed inset-0 bg-black/50 z-40 md:hidden"
-                onClick={() => setIsOpen(false)}
+                onClick={toggleMenu}
               />
 
               {/* Menu */}
               <motion.div
+                className="fixed top-0 right-0 bottom-0 w-[250px] bg-white z-50 p-6"
+                variants={menuVariants}
                 initial="closed"
                 animate="open"
                 exit="closed"
-                variants={menuVariants}
-                className="fixed top-0 right-0 bottom-0 w-[300px] bg-white z-50 md:hidden shadow-xl"
               >
-                <div className="flex flex-col h-full">
-                  {/* Menu Items Container */}
-                  <div className="flex-1 overflow-y-auto py-8">
-                    <div className="px-6 space-y-6">
-                      {/* Navigation Items */}
-                      {navItems.map((item, index) => (
+                <div className="flex flex-col space-y-4">
+                  {navItems.map((item) => {
+                    const itemPath = item === 'Home' ? '/' : `/${item.toLowerCase()}`
+                    const isActive = pathname === itemPath
+
+                    return (
+                      <Link
+                        key={item}
+                        href={itemPath}
+                        className={cn(
+                          "text-lg font-medium",
+                          isActive ? "text-red-600" : "text-gray-600"
+                        )}
+                        onClick={toggleMenu}
+                      >
+                        {item}
+                      </Link>
+                    )
+                  })}
+
+                  {/* Mobile Resources Dropdown */}
+                  <div className="relative">
+                    <span className={cn(
+                      "text-lg font-medium",
+                      pathname.startsWith('/resources') ? "text-red-600" : "text-gray-600"
+                    )}>
+                      Resources
+                    </span>
+                    <div className="mt-2 space-y-2 pl-4">
+                      {resourcesItems.map((item) => (
                         <Link
-                          key={item}
-                          href={item === 'Home' ? '/' : 
-                                item === 'About' ? '/about' : 
-                                item === 'Services' ? '/services' : 
-                                item === 'Gallery' ? '/gallery' :
-                                item === 'Contact' ? '/contact' :
-                                `#${item.toLowerCase()}`}
-                          className="block text-lg font-medium text-gray-800 hover:text-red-600 transition-colors duration-200"
-                          onClick={() => setIsOpen(false)}
+                          key={item.name}
+                          href={item.href}
+                          className={cn(
+                            "block text-sm",
+                            pathname === item.href ? "text-red-600" : "text-gray-600"
+                          )}
+                          onClick={toggleMenu}
                         >
-                          {item}
+                          {item.name}
                         </Link>
                       ))}
                     </div>
                   </div>
 
-                  {/* Contact Info and Donate Section */}
-                  <div className="border-t border-gray-100 p-6 space-y-4">
+                  <div className="pt-4 border-t border-gray-200">
                     <a 
                       href="tel:+27437262171" 
-                      className="flex items-center text-gray-600 hover:text-red-600 transition-colors duration-200"
-                      onClick={() => setIsOpen(false)}
+                      className="text-gray-600 hover:text-gray-900 block mb-2"
+                      onClick={toggleMenu}
                     >
-                      <PhoneIcon className="h-5 w-5 mr-3" />
-                      <span className="text-lg">+27 43 726 2171</span>
+                      <PhoneIcon className="h-5 w-5 inline mr-2" />
+                      +27 43 726 2171
                     </a>
-                    
                     <Button 
                       asChild 
-                      className="w-full justify-center text-lg bg-red-600 text-white hover:bg-red-700"
-                      onClick={() => setIsOpen(false)}
+                      className="w-full bg-red-600 text-white hover:bg-red-700"
+                      onClick={toggleMenu}
                     >
-                      <Link href="#donate">Donate Now</Link>
+                      <Link href="/donate">Donate Now</Link>
                     </Button>
                   </div>
                 </div>
