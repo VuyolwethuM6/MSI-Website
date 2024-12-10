@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
 import { PhoneIcon, EnvelopeIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -14,6 +14,12 @@ import {
   DropdownMenuContent, 
   DropdownMenuItem 
 } from "@/components/ui/dropdown-menu"
+
+// Dynamically import Framer Motion components
+const Motion = {
+  motion: dynamic(() => import('framer-motion').then(mod => mod.motion), { ssr: false }),
+  AnimatePresence: dynamic(() => import('framer-motion').then(mod => mod.AnimatePresence), { ssr: false })
+}
 
 const menuVariants = {
   closed: {
@@ -38,13 +44,15 @@ const backdropVariants = {
   closed: {
     opacity: 0,
     transition: {
-      duration: 0.2
+      duration: 0.2,
+      ease: 'easeInOut'
     }
   },
   open: {
     opacity: 1,
     transition: {
-      duration: 0.2
+      duration: 0.2,
+      ease: 'easeInOut'
     }
   }
 }
@@ -81,11 +89,10 @@ const Header = () => {
   const resourcesItems = [
     { name: 'Past Papers', href: '/resources/past-papers' },
     { name: 'Student Portal', href: '/resources/student-portal' },
-    { name: 'Study Materials', href: '/resources/study-materials' },
-    { name: 'Video Tutorials', href: '/resources/video-tutorials' },
+    { name: 'Study Materials', href: '/resources/study-materials' }
   ]
 
-  const navItems = ['Home', 'About', 'Services', 'Gallery', 'Contact']
+  const navItems = ['Home', 'About', 'Services', 'Gallery', 'Blog', 'Contact']
 
   return (
     <header className={`fixed w-full z-50 transition-all duration-300 ${isScrolled || isResourcePage ? 'bg-white shadow-md' : 'bg-transparent'}`}>
@@ -111,7 +118,7 @@ const Header = () => {
                     isActive && (isScrolled || isResourcePage ? "text-red-600" : "text-red-400")
                   )}
                 >
-                  {item}
+                  {item === 'Blog' ? 'Blog' : item}
                 </Link>
               )
             })}
@@ -175,11 +182,11 @@ const Header = () => {
         </div>
 
         {/* Mobile Navigation Overlay */}
-        <AnimatePresence>
+        <Motion.AnimatePresence>
           {isOpen && (
             <>
               {/* Backdrop */}
-              <motion.div
+              <Motion.motion.div
                 className="fixed inset-0 bg-black/50 z-40"
                 variants={backdropVariants}
                 initial="closed"
@@ -189,7 +196,7 @@ const Header = () => {
               />
 
               {/* Menu */}
-              <motion.div
+              <Motion.motion.div
                 className="fixed top-0 right-0 bottom-0 w-[250px] bg-white z-50 p-6"
                 variants={menuVariants}
                 initial="closed"
@@ -211,7 +218,7 @@ const Header = () => {
                         )}
                         onClick={toggleMenu}
                       >
-                        {item}
+                        {item === 'Blog' ? 'Blog' : item}
                       </Link>
                     )
                   })}
@@ -259,10 +266,10 @@ const Header = () => {
                     </Button>
                   </div>
                 </div>
-              </motion.div>
+              </Motion.motion.div>
             </>
           )}
-        </AnimatePresence>
+        </Motion.AnimatePresence>
       </div>
     </header>
   )

@@ -1,7 +1,5 @@
-'use client'
+'use client';
 
-import { motion } from 'framer-motion'
-import { useInView } from 'react-intersection-observer'
 import Image from 'next/image'
 import Link from 'next/link'
 import Header from '../components/Header'
@@ -9,22 +7,17 @@ import Footer from '../components/Footer'
 import Testimonials from '../components/Testimonials'
 import Gallery from '../components/Gallery'
 import { Button } from "@/components/ui/button"
+import { getBlogPosts } from '@/lib/blog'
+import { motion } from 'framer-motion'
+import { GraduationCap, Microscope, Tent } from 'lucide-react'
 
 export default function Home() {
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
-  })
-
-  const fadeIn = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  }
+  const latestPosts = getBlogPosts().slice(0, 3);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      
+
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center bg-gradient-to-r from-red-600 to-red-800 text-white overflow-hidden">
         <div className="absolute inset-0 z-0">
@@ -39,27 +32,37 @@ export default function Home() {
         </div>
         <div className="container mx-auto px-4 text-center relative z-10">
           <motion.h1 
-            initial="hidden"
-            animate="visible"
-            variants={fadeIn}
-            transition={{ duration: 0.5 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              type: "spring", 
+              stiffness: 100, 
+              damping: 10,
+              duration: 0.5 
+            }}
             className="text-5xl md:text-7xl font-bold mb-6"
           >
             Empowering Through Education
           </motion.h1>
+          
           <motion.p 
-            initial="hidden"
-            animate="visible"
-            variants={fadeIn}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              type: "spring", 
+              stiffness: 100, 
+              damping: 10,
+              duration: 0.5,
+              delay: 0.2 
+            }}
             className="text-xl md:text-2xl mb-8"
           >
             Black Founded & Youth Managed Non-Profit Organization
           </motion.p>
+          
           <motion.div 
-            initial="hidden"
-            animate="visible"
-            variants={fadeIn}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
           >
             <Button
@@ -79,10 +82,8 @@ export default function Home() {
       <section id="about" className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <motion.div 
-            ref={ref}
-            initial="hidden"
-            animate={inView ? "visible" : "hidden"}
-            variants={fadeIn}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className="flex flex-col md:flex-row items-center"
           >
@@ -110,24 +111,35 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">Our Services</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { title: 'Tutoring', icon: '🎓', description: 'One-on-one and group tutoring sessions in mathematics and science subjects.' },
-              { title: 'Workshops', icon: '🔬', description: 'Interactive workshops focusing on practical applications of STEM concepts.' },
-              { title: 'STEM Camps', icon: '🏕️', description: 'Immersive camps that combine learning with fun outdoor activities.' }
-            ].map((service, index) => (
-              <motion.div 
-                key={service.title}
-                initial="hidden"
-                animate={inView ? "visible" : "hidden"}
-                variants={fadeIn}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
-              >
-                <div className="text-4xl mb-4">{service.icon}</div>
-                <h3 className="text-xl font-semibold mb-4 text-gray-800">{service.title}</h3>
-                <p className="text-gray-600">{service.description}</p>
-              </motion.div>
-            ))}
+          {[
+  { 
+    title: 'Tutoring', 
+    icon: <GraduationCap className="text-4xl text-red-600" />, 
+    description: 'One-on-one and group tutoring sessions in mathematics and science subjects.' 
+  },
+  { 
+    title: 'Workshops', 
+    icon: <Microscope className="text-4xl text-red-600" />, 
+    description: 'Interactive workshops focusing on practical applications of STEM concepts.' 
+  },
+  { 
+    title: 'STEM Camps', 
+    icon: <Tent className="text-4xl text-red-600" />, 
+    description: 'Immersive camps that combine learning with fun outdoor activities.' 
+  }
+].map((service, index) => (
+  <motion.div 
+    key={service.title}
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5, delay: index * 0.1 }}
+    className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
+  >
+    <div className="mb-4">{service.icon}</div>
+    <h3 className="text-xl font-semibold mb-4 text-gray-800">{service.title}</h3>
+    <p className="text-gray-600">{service.description}</p>
+  </motion.div>
+))}
           </div>
         </div>
       </section>
@@ -146,7 +158,7 @@ export default function Home() {
               <motion.div 
                 key={stat.label}
                 initial={{ opacity: 0, scale: 0.5 }}
-                animate={inView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="w-full sm:w-1/2 md:w-1/4 mb-8"
               >
@@ -163,6 +175,65 @@ export default function Home() {
 
       {/* Gallery Section */}
       <Gallery />
+
+      {/* Blog Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="space-y-12">
+            <h2 className="text-3xl font-bold text-center text-gray-800">
+              Latest Blog Posts
+            </h2>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {latestPosts.map((post) => (
+                <motion.div
+                  key={post.slug}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all transform hover:-translate-y-2 duration-300"
+                >
+                  <Link href={`/blog/${post.slug}`}>
+                    {post.frontmatter.image && (
+                      <Image
+                        src={post.frontmatter.image}
+                        alt={post.frontmatter.title}
+                        width={400}
+                        height={250}
+                        className="w-full h-48 object-cover"
+                      />
+                    )}
+                    <div className="p-6">
+                      <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                        {post.frontmatter.title}
+                      </h3>
+                      <p className="text-gray-600 mb-4 line-clamp-3">
+                        {post.frontmatter.excerpt}
+                      </p>
+                      <div className="flex justify-between items-center text-sm text-gray-500">
+                        <span>{post.frontmatter.author}</span>
+                        <span>{post.frontmatter.date}</span>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="text-center">
+              <Button
+                asChild
+                size="lg"
+                className="bg-red-600 text-white hover:bg-red-700"
+              >
+                <Link href="/blog">
+                  View All Blog Posts
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Call to Action */}
       <section className="py-20 bg-gray-100">

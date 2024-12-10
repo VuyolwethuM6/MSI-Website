@@ -55,7 +55,12 @@ export const metadata: Metadata = {
   },
   viewport: 'width=device-width, initial-scale=1, maximum-scale=5',
   themeColor: '#dc2626',
-  manifest: '/manifest.json'
+  manifest: '/manifest.json',
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
 }
 
 export default function RootLayout({

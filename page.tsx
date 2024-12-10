@@ -1,8 +1,12 @@
 import { Phone, Mail } from 'lucide-react'
 import Link from "next/link"
 import Image from "next/image"
+import { getBlogPosts } from '@/lib/blog'
 
 export default function Home() {
+  // Get the latest 3 blog posts
+  const latestPosts = getBlogPosts().slice(0, 3);
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Top Bar */}
@@ -78,6 +82,67 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Blog Section */}
+      <section className="py-16 bg-gray-100">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Latest Blog Posts
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Explore insights, stories, and educational perspectives from MSI
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {latestPosts.map((post) => (
+              <div 
+                key={post.slug} 
+                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300"
+              >
+                {post.frontmatter.image && (
+                  <Image 
+                    src={post.frontmatter.image} 
+                    alt={post.frontmatter.title}
+                    width={400}
+                    height={250}
+                    className="w-full h-48 object-cover"
+                  />
+                )}
+                <div className="p-6">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                    {post.frontmatter.title}
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    {post.frontmatter.excerpt}
+                  </p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-500">
+                      {post.frontmatter.date}
+                    </span>
+                    <Link 
+                      href={`/blog/${post.slug}`} 
+                      className="text-red-600 hover:text-red-800 font-medium"
+                    >
+                      Read More →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-10">
+            <Link 
+              href="/blog" 
+              className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors"
+            >
+              View All Blog Posts
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Stats Section */}
       <div className="py-16 bg-white">
         <div className="container mx-auto px-4">
@@ -99,4 +164,3 @@ export default function Home() {
     </div>
   )
 }
-

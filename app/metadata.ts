@@ -2,7 +2,7 @@ export const siteConfig = {
   name: "MSI - Maths and Science Infinity",
   description: "Empowering youth through STEM education. MSI is a Black Founded & Youth Managed Non-Profit Organization dedicated to providing quality mathematics and science education in South Africa.",
   url: "https://mathsandscienceinfinity.org",
-  ogImage: "/images/msi-og.jpg",
+  ogImage: "/images/msi-loo.png",
   links: {
     facebook: "https://facebook.com/mathsandscienceinfinity",
     twitter: "https://twitter.com/msi_education",
